@@ -1,7 +1,7 @@
 <div>
   <h1>Sudoku</h1>
 
-  <table class="sudoku-table">
+  <table class="sudoku-table" #sudokuTable (keyup)="onTableKeyup($event)">
     <tbody>
       <tr class="">
         <td class="" cell-index="0">
