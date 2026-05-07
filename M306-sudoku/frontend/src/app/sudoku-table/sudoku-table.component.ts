@@ -1,11 +1,12 @@
 import { Component, OnInit } from "@angular/core";
-import * as $ from "jquery";
+import $ from "jquery";
 // import * as axios from "axios";
 // const axios = require("axios").default;
 import axios from "axios";
 
 @Component({
   selector: "app-sudoku-table",
+  standalone: true,
   templateUrl: "./sudoku-table.component.html",
   styleUrls: ["./sudoku-table.component.css"]
 })
@@ -15,7 +16,7 @@ export class SudokuTableComponent implements OnInit {
   ngOnInit(): void {
     $(document).ready(function() {
       // Add event listenner on cell input, cell input will be send to the java backend for confirmation of input
-      $("td").keyup(function(event) {
+      $("td").keyup(function(event: any) {
         let cell = event.currentTarget;
 
         // if the input is not a valid number (1-9) we clear the cell
@@ -41,7 +42,7 @@ export class SudokuTableComponent implements OnInit {
         //sudoku table representation
         var listTD = $("td");
         var sudokuTable = new Array(81);
-        $.each(listTD, function(index, cell) {
+        $.each(listTD, function(index: number, cell: any) {
           let cellIndexListTD = cell.getAttribute("cell-index");
           let cellVal = cell.innerText;
           if (cellVal == "" || cellIndexListTD == cellIndex) {
@@ -61,8 +62,8 @@ export class SudokuTableComponent implements OnInit {
 
         // use axios module to send the json to the backend
         axios
-          .post("http://localhost:8080/demo/move", jsonToSend)
-          .then(response => {
+          .post("http://localhost:8081/move", jsonToSend)
+          .then((response: any) => {
             if (response.data == true) {
               $(cell).removeClass("incorrect-input");
               return true;
@@ -71,9 +72,12 @@ export class SudokuTableComponent implements OnInit {
               return false;
             }
           })
-          .catch(error => {
+          .catch((error: any) => {
             console.log(error);
+            return false;
           });
+
+        return true;
       }); // td keyup
     });
   }
