@@ -1,4 +1,4 @@
-package com.example.demo;
+package ch.julian.sudoku.controller;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
