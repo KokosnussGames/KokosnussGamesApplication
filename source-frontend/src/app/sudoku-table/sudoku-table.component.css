@@ -1,0 +1,41 @@
+/* Center title */
+h1 {
+  text-align: center;
+}
+
+/* drew sudoku outside and Center table in page*/
+
+.sudoku-table {
+  font-size: 1.75em;
+  border: 6px solid #444;
+  border-collapse: collapse;
+  background: #fff;
+  margin: 0 auto;
+}
+
+/* drew sudoku inside */
+
+td {
+  border: 2px solid #444;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+}
+
+/* draw bigger line to make 3x3 sudoku box more visible */
+.sudoku-table tr:nth-child(3n + 3) {
+  border-bottom: 5px solid #444;
+}
+
+.sudoku-table td:nth-child(3n + 3) {
+  border-right: 5px solid #444;
+}
+
+/* make cell that are already filled greenish  */
+td:not([contenteditable]) {
+  background: rgba(222, 245, 97, 0.59);
+}
+
+.incorrect-input {
+  background: red;
+}
