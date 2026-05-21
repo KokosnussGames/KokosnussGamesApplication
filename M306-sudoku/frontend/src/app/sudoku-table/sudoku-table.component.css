@@ -1,41 +1,59 @@
-/* Center title */
-h1 {
-  text-align: center;
+:host {
+  display: block;
+  padding: 0.75rem;
 }
 
-/* drew sudoku outside and Center table in page*/
+div {
+  display: flex;
+  justify-content: center;
+}
 
 .sudoku-table {
-  font-size: 1.75em;
-  border: 6px solid #444;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  font-size: clamp(1.2rem, 2.8vw, 1.7rem);
+  font-weight: 600;
+  color: #0f172a;
+  border: 4px solid #334155;
   border-collapse: collapse;
-  background: #fff;
-  margin: 0 auto;
+  table-layout: fixed;
+  margin: 0;
+  background: #ffffff;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.16);
 }
-
-/* drew sudoku inside */
 
 td {
-  border: 2px solid #444;
-  width: 50px;
-  height: 50px;
+  border: 1.5px solid #94a3b8;
+  width: clamp(2.2rem, 9vw, 3.15rem);
+  height: clamp(2.2rem, 9vw, 3.15rem);
   text-align: center;
+  vertical-align: middle;
+  transition: background-color 140ms ease, box-shadow 140ms ease;
 }
 
-/* draw bigger line to make 3x3 sudoku box more visible */
 .sudoku-table tr:nth-child(3n + 3) {
-  border-bottom: 5px solid #444;
+  border-bottom: 3px solid #334155;
 }
 
 .sudoku-table td:nth-child(3n + 3) {
-  border-right: 5px solid #444;
+  border-right: 3px solid #334155;
 }
 
-/* make cell that are already filled greenish  */
 td:not([contenteditable]) {
-  background: rgba(222, 245, 97, 0.59);
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+td[contenteditable] {
+  background: #f8fafc;
+}
+
+td[contenteditable]:focus {
+  outline: none;
+  background: #dbeafe;
+  box-shadow: inset 0 0 0 2px #2563eb;
 }
 
 .incorrect-input {
-  background: red;
+  background: #fecaca;
+  box-shadow: inset 0 0 0 2px #dc2626;
 }
