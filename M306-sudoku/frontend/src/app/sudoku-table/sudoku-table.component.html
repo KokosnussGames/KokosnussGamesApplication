@@ -1,5 +1,12 @@
 <div>
-  <table class="sudoku-table" #sudokuTable (keyup)="onTableKeyup($event)">
+  <table
+    class="sudoku-table"
+    #sudokuTable
+    (click)="onEditableCellFocus($event)"
+    (focusin)="onEditableCellFocus($event)"
+    (focusout)="onEditableCellBlur($event)"
+    (keyup)="onTableKeyup($event)"
+  >
     <tbody>
       <tr class="">
         <td class="" cell-index="0">

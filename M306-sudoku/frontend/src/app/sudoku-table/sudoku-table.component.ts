@@ -9,19 +9,44 @@ import { Component, ElementRef, ViewChild } from "@angular/core";
 })
 export class SudokuTableComponent {
   @ViewChild("sudokuTable", { static: true }) sudokuTableRef!: ElementRef<HTMLTableElement>;
+  private readonly emptyCellCaretMarker = "\u200B";
 
   constructor(private readonly http: HttpClient) {}
 
-  onTableKeyup(event: KeyboardEvent): void {
-    const target = event.target;
-    if (!(target instanceof HTMLTableCellElement) || !target.isContentEditable) {
+  onEditableCellFocus(event: Event): void {
+    const cell = this.getEditableCell(event.target);
+    if (cell === null) {
       return;
     }
 
-    const currentValue = target.innerText.trim();
+    this.prepareEmptyCellForCaret(cell);
+  }
+
+  onEditableCellBlur(event: Event): void {
+    const cell = this.getEditableCell(event.target);
+    if (cell === null || this.getCellValue(cell) !== "") {
+      return;
+    }
+
+    cell.textContent = "";
+  }
+
+  onTableKeyup(event: KeyboardEvent): void {
+    const target = this.getEditableCell(event.target);
+    if (target === null) {
+      return;
+    }
+
+    const currentValue = this.getCellValue(target);
+    if (target.textContent?.includes(this.emptyCellCaretMarker) && currentValue !== "") {
+      target.textContent = currentValue;
+      this.moveCaretToEnd(target);
+    }
+
     if (!/^[1-9]$/.test(currentValue)) {
-      target.innerText = "";
+      target.textContent = "";
       target.classList.remove("incorrect-input");
+      this.prepareEmptyCellForCaret(target);
       return;
     }
 
@@ -59,7 +84,7 @@ export class SudokuTableComponent {
       }
 
       const cellIndex = Number.parseInt(indexAttribute, 10);
-      const cellValueText = cell.innerText.trim();
+      const cellValueText = this.getCellValue(cell);
       if (cellValueText === "" || cellIndex === currentCellIndex) {
         sudokuTable[cellIndex] = 0;
         return;
@@ -70,5 +95,52 @@ export class SudokuTableComponent {
     });
 
     return sudokuTable;
+  }
+
+  private getEditableCell(target: EventTarget | null): HTMLTableCellElement | null {
+    if (target instanceof HTMLTableCellElement && target.isContentEditable) {
+      return target;
+    }
+
+    if (target instanceof Element) {
+      const cell = target.closest("td[contenteditable]");
+      if (cell instanceof HTMLTableCellElement) {
+        return cell;
+      }
+    }
+
+    return null;
+  }
+
+  private getCellValue(cell: HTMLTableCellElement): string {
+    return (cell.textContent ?? "").split(this.emptyCellCaretMarker).join("").trim();
+  }
+
+  private prepareEmptyCellForCaret(cell: HTMLTableCellElement): void {
+    if (this.getCellValue(cell) !== "") {
+      return;
+    }
+
+    cell.textContent = this.emptyCellCaretMarker;
+    this.moveCaretToEnd(cell);
+  }
+
+  private moveCaretToEnd(cell: HTMLTableCellElement): void {
+    const textNode = cell.firstChild;
+    if (!(textNode instanceof Text)) {
+      return;
+    }
+
+    const range = document.createRange();
+    range.setStart(textNode, textNode.length);
+    range.collapse(true);
+
+    const selection = window.getSelection();
+    if (selection === null) {
+      return;
+    }
+
+    selection.removeAllRanges();
+    selection.addRange(range);
   }
 }

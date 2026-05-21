@@ -1,6 +1,7 @@
 :host {
   display: block;
   padding: 0.75rem;
+  --cell-size: clamp(2.2rem, 9vw, 3.15rem);
 }
 
 div {
@@ -23,8 +24,10 @@ div {
 
 td {
   border: 1.5px solid #94a3b8;
-  width: clamp(2.2rem, 9vw, 3.15rem);
-  height: clamp(2.2rem, 9vw, 3.15rem);
+  width: var(--cell-size);
+  height: var(--cell-size);
+  line-height: var(--cell-size);
+  padding: 0;
   text-align: center;
   vertical-align: middle;
   transition: background-color 140ms ease, box-shadow 140ms ease;
@@ -45,6 +48,7 @@ td:not([contenteditable]) {
 
 td[contenteditable] {
   background: #f8fafc;
+  caret-color: #0f172a;
 }
 
 td[contenteditable]:focus {
