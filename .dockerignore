@@ -1,0 +1,14 @@
+.git
+.gitignore
+**/.angular
+**/.gradle
+**/.idea
+**/.settings
+**/.vscode
+**/bin
+**/build
+**/dist
+**/node_modules
+**/target
+**/*.err
+**/*.log
