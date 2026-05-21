@@ -67,7 +67,7 @@ export class SudokuTableComponent {
       sudokuTable
     };
 
-    this.http.post<boolean>("http://localhost:8081/move", payload).subscribe({
+    this.http.post<boolean>("/api/sudoku/move", payload).subscribe({
       next: (isAccepted: boolean) => {
         target.classList.toggle("incorrect-input", !isAccepted);
       },

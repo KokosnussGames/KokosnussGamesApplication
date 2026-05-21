@@ -7,7 +7,7 @@ import { CheckSolutionResponse, NonogramPuzzle } from '../models/nonogram.model'
   providedIn: 'root'
 })
 export class NonogramApiService {
-  private readonly apiUrl = 'http://localhost:8080/api/nonogram';
+  private readonly apiUrl = '/api/nonogram';
 
   constructor(private http: HttpClient) {}
 

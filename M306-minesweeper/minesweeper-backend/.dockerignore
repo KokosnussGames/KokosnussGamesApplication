@@ -1,0 +1,10 @@
+.git
+.gitignore
+.mvn/wrapper/maven-wrapper.jar.tmp
+.settings
+.classpath
+.project
+target
+Dockerfile
+*.log
+*.err

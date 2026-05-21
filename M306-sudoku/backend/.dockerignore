@@ -1,0 +1,12 @@
+.git
+.gitignore
+.gradle
+.settings
+.classpath
+.project
+bin
+build
+Dockerfile
+old-test-postman
+*.log
+*.err

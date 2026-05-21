@@ -8,7 +8,7 @@ import { Board } from '../models/board';
 })
 export class GameService {
 
-  private api = 'http://localhost:8080/api/game';
+  private api = '/api/minesweeper';
 
   constructor(private http: HttpClient) {}
 
