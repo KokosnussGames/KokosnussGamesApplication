@@ -18,6 +18,29 @@
   background: #092f34;
 }
 
+.menu-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 78% 16%, rgba(255, 222, 120, 0.38), transparent 17%),
+    radial-gradient(ellipse at 54% 86%, rgba(137, 220, 209, 0.16), transparent 36%),
+    linear-gradient(180deg, transparent 0%, rgba(8, 86, 91, 0.13) 74%, rgba(3, 32, 36, 0.28) 100%),
+    radial-gradient(circle at center, transparent 0 54%, rgba(4, 19, 18, 0.58) 100%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 4px);
+  mix-blend-mode: multiply;
+  opacity: 0.58;
+}
+
+.game-shell::before {
+  background:
+    radial-gradient(circle at 78% 16%, rgba(255, 222, 120, 0.42), transparent 16%),
+    linear-gradient(180deg, transparent 0 58%, rgba(3, 32, 36, 0.35) 100%);
+  opacity: 0.5;
+}
+
 .menu-stage {
   position: absolute;
   inset: 0;
@@ -45,22 +68,6 @@
   background-size: cover;
   animation: sceneDrift 22s ease-in-out infinite alternate;
   pointer-events: none;
-}
-
-.menu-stage::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 12;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 78% 16%, rgba(255, 222, 120, 0.38), transparent 17%),
-    radial-gradient(ellipse at 54% 86%, rgba(137, 220, 209, 0.16), transparent 36%),
-    linear-gradient(180deg, transparent 0%, rgba(8, 86, 91, 0.13) 74%, rgba(3, 32, 36, 0.28) 100%),
-    radial-gradient(circle at center, transparent 0 54%, rgba(4, 19, 18, 0.58) 100%),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 4px);
-  mix-blend-mode: multiply;
-  opacity: 0.58;
 }
 
 .intro-clouds {
@@ -206,17 +213,8 @@
   grid-template-columns: minmax(280px, 0.82fr) minmax(420px, 1fr);
 }
 
-.game-view {
-  display: grid;
-  grid-template-columns: 1fr;
-  place-items: center;
-  padding: clamp(16px, 3vw, 34px);
-}
-
-.game-view::after {
-  background:
-    radial-gradient(circle at 78% 16%, rgba(255, 222, 120, 0.42), transparent 16%),
-    linear-gradient(180deg, transparent 0 58%, rgba(3, 32, 36, 0.35) 100%);
+.game-shell .intro-clouds {
+  display: none;
 }
 
 .settings-dock {
@@ -231,30 +229,47 @@
 }
 
 .game-dock {
-  position: relative;
+  --game-stage-padding-block: clamp(22px, 4dvh, 42px);
+
+  position: fixed;
+  top: var(--game-stage-padding-block);
+  bottom: var(--game-stage-padding-block);
+  left: 50%;
   z-index: 14;
   width: min(1180px, 94vw);
+  min-height: 0;
+  transform: translate3d(-50%, 0, 0);
+  contain: layout;
+}
+
+.game-dock-inner {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   justify-items: center;
   gap: 12px;
   opacity: 0;
   animation: gameReveal 680ms cubic-bezier(0.18, 0.72, 0.18, 1) 240ms forwards;
+  will-change: opacity, transform;
 }
 
-.game-dock h2 {
-  margin: 0;
+.game-dock-inner h2 {
+  margin: 0 0 2px;
   color: #fff8df;
   font-size: clamp(2.1rem, 4.3vw, 4.1rem);
-  line-height: 0.95;
+  line-height: 1.08;
   text-align: center;
   text-shadow: 0 5px 18px rgba(0, 0, 0, 0.42);
 }
 
 .game-frame-sign {
   width: 100%;
-  height: min(62dvh, 650px);
-  min-height: 320px;
+  height: 100%;
+  min-height: 0;
   padding: 18px;
+  overflow: hidden;
   border: 5px solid #332015;
   border-radius: 11px;
   background:
@@ -276,6 +291,7 @@
   display: block;
   width: 100%;
   height: 100%;
+  min-height: 0;
   border: 4px solid #2c1b12;
   border-radius: 7px;
   background: #f8f3e6;
@@ -777,11 +793,11 @@
 @keyframes gameReveal {
   from {
     opacity: 0;
-    transform: translateY(28px) scale(0.97);
+    transform: translate3d(0, 28px, 0) scale(0.97);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 

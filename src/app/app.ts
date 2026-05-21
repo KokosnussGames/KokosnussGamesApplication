@@ -4,11 +4,14 @@ import { NavigationEnd, Router } from '@angular/router';
 @Component({
   selector: 'app-root',
   template: `
-    <main class="menu-shell" aria-label="Coconut Games main menu">
+    <main
+      class="menu-shell"
+      [class.game-shell]="!!activeGame"
+      aria-label="Coconut Games main menu"
+    >
       <section
         class="menu-stage"
         [class.settings-view]="isSettingsView"
-        [class.game-view]="!!activeGame"
       >
         <div class="scene-bg" aria-hidden="true"></div>
         <div class="intro-clouds" aria-hidden="true"></div>
@@ -100,14 +103,21 @@ import { NavigationEnd, Router } from '@angular/router';
           </section>
         }
 
-        @if (activeGame) {
-          <section class="game-dock" aria-label="Spielansicht">
+        <div class="shore-shadow" aria-hidden="true"></div>
+        <div class="ambient-particles" aria-hidden="true"></div>
+      </section>
+
+      @if (activeGame) {
+        <section class="game-dock" aria-label="Spielansicht">
+          <div class="game-dock-inner" (animationend)="resetDocumentScroll()">
             <h2>{{ activeGame.title }}</h2>
             <div class="game-frame-sign">
               <iframe
                 title="Spielplatz"
                 src="https://www.google.com/webhp?igu=1"
                 referrerpolicy="no-referrer"
+                tabindex="-1"
+                (load)="resetDocumentScroll()"
               ></iframe>
             </div>
             <button
@@ -118,12 +128,9 @@ import { NavigationEnd, Router } from '@angular/router';
             >
               Zurück zum Menü
             </button>
-          </section>
-        }
-
-        <div class="shore-shadow" aria-hidden="true"></div>
-        <div class="ambient-particles" aria-hidden="true"></div>
-      </section>
+          </div>
+        </section>
+      }
     </main>
   `,
 })
@@ -316,6 +323,19 @@ export class App {
 
     this.isSettingsView = normalizedPath === '/settings';
     this.activeGame = this.games.find((game) => game.href === normalizedPath && game.href !== '/settings');
+    this.resetDocumentScroll();
+  }
+
+  protected resetDocumentScroll(): void {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    window.requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
   }
 
   private ensureMusicStarted(): void {
