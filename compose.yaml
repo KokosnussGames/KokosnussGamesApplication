@@ -1,0 +1,64 @@
+name: kokosnuss-games
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+      network: host
+    image: kokosnuss-games/frontend:latest
+    depends_on:
+      - sudoku-backend
+      - nonogram-backend
+      - minesweeper-backend
+    ports:
+      - "8080:8080"
+    networks:
+      - kokosnuss-games
+    restart: unless-stopped
+
+  sudoku-backend:
+    build:
+      context: ./M306-sudoku/backend
+      network: host
+    image: kokosnuss-games/sudoku-backend:latest
+    environment:
+      JAVA_OPTS: "-XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
+      SERVER_PORT: "8081"
+    expose:
+      - "8081"
+    networks:
+      - kokosnuss-games
+    restart: unless-stopped
+
+  nonogram-backend:
+    build:
+      context: ./M306-nonogram/backend
+      network: host
+    image: kokosnuss-games/nonogram-backend:latest
+    environment:
+      JAVA_OPTS: "-XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
+      SERVER_PORT: "8080"
+    expose:
+      - "8080"
+    networks:
+      - kokosnuss-games
+    restart: unless-stopped
+
+  minesweeper-backend:
+    build:
+      context: ./M306-minesweeper/minesweeper-backend
+      network: host
+    image: kokosnuss-games/minesweeper-backend:latest
+    environment:
+      JAVA_OPTS: "-XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
+      SERVER_PORT: "8080"
+    expose:
+      - "8080"
+    networks:
+      - kokosnuss-games
+    restart: unless-stopped
+
+networks:
+  kokosnuss-games:
+    driver: bridge

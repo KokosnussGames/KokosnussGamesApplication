@@ -1,4 +1,5 @@
 import { Component, HostListener } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { NavigationEnd, Router } from '@angular/router';
 
 @Component({
@@ -114,7 +115,8 @@ import { NavigationEnd, Router } from '@angular/router';
             <div class="game-frame-sign">
               <iframe
                 title="Spielplatz"
-                src="https://www.google.com/webhp?igu=1"
+                [src]="activeGame.frameSrc"
+                allowtransparency="true"
                 referrerpolicy="no-referrer"
                 tabindex="-1"
                 (load)="resetDocumentScroll()"
@@ -137,7 +139,8 @@ import { NavigationEnd, Router } from '@angular/router';
 export class App {
   protected selectedGameIndex = 0;
   protected isSettingsView = false;
-  protected activeGame?: { title: string; href: string };
+  protected activeGame?: GameLink;
+  protected readonly games: GameLink[];
   protected musicVolume = Number(localStorage.getItem('coconutMusicVolume') ?? 42);
   protected musicEnabled = localStorage.getItem('coconutMusicEnabled') !== 'false';
 
@@ -146,7 +149,11 @@ export class App {
   private lastHoverSoundAt = 0;
   private musicPrimedMuted = false;
 
-  constructor(private readonly router: Router) {
+  constructor(
+    private readonly router: Router,
+    private readonly sanitizer: DomSanitizer,
+  ) {
+    this.games = this.createGameLinks();
     this.createMusicAudio();
     this.primeMusicPlayback();
     this.updateViewFromPath(this.router.url);
@@ -158,36 +165,42 @@ export class App {
     });
   }
 
-  protected readonly games = [
-    {
-      title: 'Sudoku',
-      meta: 'logic lagoon',
-      href: '/sudoku',
-      icon: '9',
-      className: 'sign-sudoku',
-    },
-    {
-      title: 'Minesweeper',
-      meta: 'volcano field',
-      href: '/minesweeper',
-      icon: '!',
-      className: 'sign-minesweeper',
-    },
-    {
-      title: 'Nonogramm',
-      meta: 'reef pixels',
-      href: '/nonogramm',
-      icon: '#',
-      className: 'sign-nonogramm',
-    },
-    {
-      title: 'Settings',
-      meta: 'sound & controls',
-      href: '/settings',
-      icon: '+',
-      className: 'sign-settings',
-    },
-  ];
+  private createGameLinks(): GameLink[] {
+    return [
+      {
+        title: 'Sudoku',
+        meta: 'logic lagoon',
+        href: '/play/sudoku',
+        frameSrc: this.sanitizer.bypassSecurityTrustResourceUrl('/sudoku/'),
+        icon: '9',
+        className: 'sign-sudoku',
+      },
+      {
+        title: 'Minesweeper',
+        meta: 'volcano field',
+        href: '/play/minesweeper',
+        frameSrc: this.sanitizer.bypassSecurityTrustResourceUrl('/minesweeper/'),
+        icon: '!',
+        className: 'sign-minesweeper',
+      },
+      {
+        title: 'Nonogram',
+        meta: 'reef pixels',
+        href: '/play/nonogram',
+        frameSrc: this.sanitizer.bypassSecurityTrustResourceUrl('/nonogram/'),
+        icon: '#',
+        className: 'sign-nonogramm',
+      },
+      {
+        title: 'Settings',
+        meta: 'sound & controls',
+        href: '/settings',
+        frameSrc: this.sanitizer.bypassSecurityTrustResourceUrl('about:blank'),
+        icon: '+',
+        className: 'sign-settings',
+      },
+    ];
+  }
 
   @HostListener('window:keydown', ['$event'])
   protected handleKeyboard(event: KeyboardEvent): void {
@@ -435,3 +448,12 @@ export class App {
     oscillator.stop(time + duration + 0.02);
   }
 }
+
+type GameLink = {
+  title: string;
+  meta: string;
+  href: string;
+  frameSrc: SafeResourceUrl;
+  icon: string;
+  className: string;
+};

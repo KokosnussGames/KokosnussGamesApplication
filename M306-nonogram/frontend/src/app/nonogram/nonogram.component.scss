@@ -1,0 +1,294 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: transparent;
+}
+
+.nonogram-page {
+  min-height: 100vh;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+h1 {
+  margin: 0 0 4px;
+  font-size: 36px;
+}
+
+h2 {
+  margin: 0;
+  color: #555;
+  font-size: 24px;
+}
+
+.puzzle-selector {
+  width: 100%;
+  max-width: 420px;
+  margin: 24px 0 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.puzzle-selector label {
+  font-weight: 700;
+  font-size: 14px;
+  color: #333;
+}
+
+.puzzle-selector input,
+.puzzle-selector select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  background: white;
+  font-size: 15px;
+}
+
+.puzzle-selector input:focus,
+.puzzle-selector select:focus {
+  outline: none;
+  border-color: #222;
+}
+
+.puzzle-count {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.game-board {
+  display: grid;
+  grid-template-columns: 120px auto;
+  grid-template-rows: 120px auto;
+  justify-content: center;
+  align-items: end;
+  transform: translateX(-60px);
+}
+
+.corner {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.column-clues {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: flex-end;
+}
+
+.column-clue {
+  width: 64px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.row-clues {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.row-clue {
+  height: 64px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  padding-right: 12px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.grid {
+  grid-column: 2;
+  grid-row: 2;
+  border: 2px solid #222;
+  background: #222;
+}
+
+.row {
+  display: flex;
+}
+
+.cell {
+  width: 64px;
+  height: 64px;
+  border: 1px solid #999;
+  background-color: white;
+  cursor: pointer;
+  font-size: 34px;
+  line-height: 1;
+  padding: 0;
+}
+
+.cell:hover {
+  background-color: #f1f1f1;
+}
+
+.cell.filled {
+  background-color: #222;
+}
+
+.cell.crossed {
+  background-color: #fff;
+  color: #777;
+}
+
+.row-clue.completed,
+.column-clue.completed {
+  color: #aaa;
+  opacity: 0.5;
+}
+
+.actions {
+  margin-top: 28px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.actions button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: #222;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.actions button.secondary {
+  background-color: #777;
+}
+
+.message {
+  margin-top: 16px;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.hint {
+  margin-top: 8px;
+  color: #666;
+  font-size: 14px;
+}
+
+.row-clue.completed,
+.column-clue.completed {
+  color: #aaa;
+  opacity: 0.45;
+}
+
+.row-clue.invalid,
+.column-clue.invalid {
+  color: #c62828;
+  opacity: 1;
+  font-weight: 800;
+}
+
+.success-panel {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 0 28px;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 2px solid #2e7d32;
+  border-radius: 14px;
+  background: #e8f5e9;
+  color: #1b5e20;
+  text-align: left;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.success-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #2e7d32;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.success-panel h3 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.success-panel p {
+  margin: 0;
+  font-size: 15px;
+}
+
+.warning-panel {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 0 28px;
+  padding: 14px 18px;
+  border: 2px solid #c62828;
+  border-radius: 12px;
+  background: #ffebee;
+  color: #b71c1c;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.grid.solved {
+  box-shadow: 0 0 0 4px #2e7d32, 0 10px 25px rgba(46, 125, 50, 0.25);
+}
+
+.grid {
+  user-select: none;
+}
+
+.cell {
+  user-select: none;
+}
+
+.instructions-card {
+  width: 100%;
+  max-width: 620px;
+  margin: 24px 0 8px;
+  padding: 18px 22px;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  background: white;
+  text-align: left;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.instructions-card h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+
+.instructions-card ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.instructions-card li {
+  margin-bottom: 6px;
+  color: #444;
+  line-height: 1.4;
+}
