@@ -1,0 +1,119 @@
+{
+	"info": {
+		"_postman_id": "94ea536d-860f-44f0-bb45-9d685f1fd09c",
+		"name": "sudoku",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "get home",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/sudoku?",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"sudoku"
+					],
+					"query": [
+						{
+							"key": "Authorization",
+							"value": "Basic base64(client_id:46b1b121-737c-409d-bde5-9c384f87961e)",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "post failing to /move",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"val\": 1,\n  \"index\": 3,\n  \"sudokuTable\": [\n    8,\n    4,\n    5,\n    0,\n    1,\n    0,\n    6,\n    0,\n    3,\n    0,\n    3,\n    7,\n    0,\n    0,\n    0,\n    4,\n    2,\n    1,\n    0,\n    0,\n    0,\n    7,\n    4,\n    3,\n    0,\n    0,\n    5,\n    7,\n    0,\n    2,\n    0,\n    0,\n    0,\n    0,\n    6,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    3,\n    0,\n    0,\n    0,\n    3,\n    6,\n    7,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    9,\n    1,\n    0,\n    0,\n    5,\n    0,\n    8,\n    0,\n    0,\n    4,\n    0,\n    0,\n    0,\n    3,\n    1,\n    0,\n    1,\n    6,\n    0,\n    0,\n    0,\n    4,\n    2,\n    9,\n    0\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/demo/move?",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"demo",
+						"move"
+					],
+					"query": [
+						{
+							"key": "Authorization",
+							"value": "Basic base64(client_id:46b1b121-737c-409d-bde5-9c384f87961e)",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "post sucessfull to /move Copy",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"val\": 1,\n  \"index\": 28,\n  \"sudokuTable\": [\n    8,\n    4,\n    5,\n    0,\n    1,\n    0,\n    6,\n    0,\n    3,\n    0,\n    3,\n    7,\n    0,\n    0,\n    0,\n    4,\n    2,\n    1,\n    0,\n    0,\n    0,\n    7,\n    4,\n    3,\n    0,\n    0,\n    5,\n    7,\n    0,\n    2,\n    0,\n    0,\n    0,\n    0,\n    6,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    3,\n    0,\n    0,\n    0,\n    3,\n    6,\n    7,\n    0,\n    0,\n    0,\n    0,\n    0,\n    0,\n    9,\n    1,\n    0,\n    0,\n    5,\n    0,\n    8,\n    0,\n    0,\n    4,\n    0,\n    0,\n    0,\n    3,\n    1,\n    0,\n    1,\n    6,\n    0,\n    0,\n    0,\n    4,\n    2,\n    9,\n    0\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/demo/move?",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"demo",
+						"move"
+					],
+					"query": [
+						{
+							"key": "Authorization",
+							"value": "Basic base64(client_id:46b1b121-737c-409d-bde5-9c384f87961e)",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
