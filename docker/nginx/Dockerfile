@@ -1,10 +1,10 @@
 FROM node:22-alpine AS menu-builder
 WORKDIR /workspace
-COPY package*.json ./
+COPY menu/package*.json ./
 RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
-COPY angular.json tsconfig*.json ./
-COPY public/ ./public/
-COPY src/ ./src/
+COPY menu/angular.json menu/tsconfig*.json ./
+COPY menu/public/ ./public/
+COPY menu/src/ ./src/
 RUN npm run build
 
 FROM node:22-alpine AS sudoku-builder
