@@ -1,0 +1,124 @@
+<div
+  class="nonogram-page"
+  *ngIf="puzzle"
+  (mouseup)="stopDrag()"
+  (mouseleave)="stopDrag()"
+>
+  <h1>Nonogram</h1>
+  <h2>{{ puzzle.name }}</h2>
+
+  <div class="instructions-card">
+    <h3>How to play</h3>
+
+    <ul>
+      <li>Use the numbers on the left and top as clues.</li>
+      <li>Each number shows how many connected cells must be filled.</li>
+      <li>Click a cell to switch between filled and X.</li>
+      <li>Press Shift and click a cell to empty the cell</li>
+      <li>Drag with the left mouse button to fill multiple cells.</li>
+      <li>Drag with the right mouse button to mark multiple cells with X.</li>
+      <li>Hold Shift while dragging to clear cells.</li>
+      <li>Completed rows and columns are grey. Impossible rows and columns are red.</li>
+    </ul>
+  </div>
+
+  <div class="puzzle-selector">
+    <label for="puzzleSearch">Search puzzle</label>
+
+    <input
+      id="puzzleSearch"
+      type="text"
+      placeholder="Search by name or id..."
+      [(ngModel)]="searchText"
+    />
+
+    <label for="puzzleSelect">Choose puzzle</label>
+
+    <select
+      id="puzzleSelect"
+      [(ngModel)]="selectedPuzzleId"
+      (change)="loadPuzzle(selectedPuzzleId)"
+    >
+      <option
+        *ngFor="let item of filteredPuzzles"
+        [ngValue]="item.id"
+      >
+        #{{ item.id }} - {{ item.name }} ({{ item.size }}x{{ item.size }})
+      </option>
+    </select>
+
+    <p class="puzzle-count">
+      Showing {{ filteredPuzzles.length }} of {{ puzzles.length }} puzzles
+    </p>
+  </div>
+
+  <div class="success-panel" *ngIf="gameSolved">
+    <div class="success-icon">✓</div>
+    <div>
+      <h3>Puzzle solved!</h3>
+      <p>You completed the Nonogram correctly.</p>
+    </div>
+  </div>
+
+  <div class="warning-panel" *ngIf="solutionProblem">
+    <strong>Something is wrong.</strong>
+    <span>The clues look completed, but the backend says the solution is not correct.</span>
+  </div>
+
+  <div class="game-board">
+    <div class="corner"></div>
+
+    <div class="column-clues">
+      <div
+        class="column-clue"
+        *ngFor="let clue of puzzle.columnClues; let colIndex = index"
+        [ngClass]="{
+          'completed': getColumnStatus(colIndex) === 'completed',
+          'invalid': getColumnStatus(colIndex) === 'invalid'
+        }"
+      >
+        <span *ngFor="let number of clue">{{ number }}</span>
+      </div>
+    </div>
+
+    <div class="row-clues">
+      <div
+        class="row-clue"
+        *ngFor="let clue of puzzle.rowClues; let rowIndex = index"
+        [ngClass]="{
+          'completed': getRowStatus(rowIndex) === 'completed',
+          'invalid': getRowStatus(rowIndex) === 'invalid'
+        }"
+      >
+        <span *ngFor="let number of clue">{{ number }}</span>
+      </div>
+    </div>
+
+    <div class="grid" [class.solved]="gameSolved">
+      <div class="row" *ngFor="let row of grid; let rowIndex = index">
+        <button
+          type="button"
+          class="cell"
+          *ngFor="let cell of row; let colIndex = index"
+          [ngClass]="{
+            'filled': cell === 1,
+            'crossed': cell === 2
+          }"
+          (mousedown)="startDrag($event, rowIndex, colIndex)"
+          (mouseenter)="dragOverCell($event, rowIndex, colIndex)"
+          (mouseup)="stopDrag()"
+          (click)="toggleCell(rowIndex, colIndex)"
+          (contextmenu)="$event.preventDefault()"
+        >
+          <span *ngIf="cell === 2">×</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button type="button" class="secondary" (click)="resetPuzzle()">Reset</button>
+  </div>
+
+  <p class="message" *ngIf="message && !gameSolved">{{ message }}</p>
+</div>
