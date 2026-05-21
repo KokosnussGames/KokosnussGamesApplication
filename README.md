@@ -1,59 +1,123 @@
-# Tuffesmenu
+# Kokosnuss Games Application
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.3.
+Kokosnuss Games is a menu application that launches three minigames inside iframes:
 
-## Development server
+- Sudoku
+- Minesweeper
+- Nonogram
 
-To start a local development server, run:
+The final application is intended to run through Docker Compose. The `frontend` container builds and serves the menu plus all three game frontends through Nginx. The three Spring Boot backends run as separate containers behind the same Nginx reverse proxy.
 
-```bash
-ng serve
+## Requirements
+
+- Git
+- Docker
+- Docker Compose plugin (`docker compose`)
+
+For local frontend development without Docker, install Node.js as well. The menu currently uses Angular 20.
+
+## Project Structure
+
+```text
+.
+├── compose.yaml
+├── docker/nginx/                 # Nginx Dockerfile and reverse proxy config
+├── src/                          # Menu Angular app
+├── public/                       # Menu static assets
+├── M306-sudoku/                  # Sudoku frontend and backend
+├── M306-minesweeper/             # Minesweeper frontend and backend
+└── M306-nonogram/                # Nonogram frontend and backend
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Run The Full Application
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+From the repository root:
 
 ```bash
-ng generate component component-name
+docker compose up --build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Open:
+
+```text
+http://localhost:8080
+```
+
+The menu is served at `/` and the games are served at:
+
+```text
+http://localhost:8080/sudoku/
+http://localhost:8080/minesweeper/
+http://localhost:8080/nonogram/
+```
+
+Backend API routes are proxied through Nginx:
+
+```text
+/api/sudoku
+/api/minesweeper
+/api/nonogram
+```
+
+## Common Docker Commands
+
+Start in the background:
 
 ```bash
-ng generate --help
+docker compose up -d --build
 ```
 
-## Building
-
-To build the project run:
+Stop the app:
 
 ```bash
-ng build
+docker compose down
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+View service status:
 
 ```bash
-ng test
+docker compose ps
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+View logs:
 
 ```bash
-ng e2e
+docker compose logs -f
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Rebuild only the frontend image:
 
-## Additional Resources
+```bash
+docker compose build frontend
+docker compose up -d frontend
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Local Menu Development
+
+To work only on the menu Angular app:
+
+```bash
+npm install
+npm start
+```
+
+Open:
+
+```text
+http://localhost:4200
+```
+
+This only starts the menu frontend. The full integrated app with all game frontends and backends should be tested with Docker Compose.
+
+Build the menu locally:
+
+```bash
+npm run build
+```
+
+## Notes
+
+- The game iframes are loaded from the same Nginx host, so the games do not need to be started separately when using Docker Compose.
+- The iframe backgrounds are transparent so the games appear directly on the menu sign.
+- If the first Docker build takes a while, it is usually downloading Node, Java, Maven, Gradle, and npm dependencies. Later builds should be faster because Docker caches the layers.
+- If a game page looks blank, check `docker compose logs -f frontend` and make sure the game path and API route return `200`.
