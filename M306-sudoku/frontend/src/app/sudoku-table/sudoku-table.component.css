@@ -13,23 +13,24 @@
 
 .new-field-button {
   border: 0;
-  border-radius: 999px;
-  padding: 0.55rem 1rem;
-  font: 700 0.95rem "Trebuchet MS", "Segoe UI", sans-serif;
-  color: #ffffff;
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
-  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.24);
+  border-radius: 8px;
+  padding: 12px 20px;
+  font: 600 0.95rem "Trebuchet MS", "Segoe UI", sans-serif;
+  color: #fff3cf;
+  background: #8f5c32;
+  box-shadow:
+    inset 0 5px 0 rgba(255, 218, 142, 0.22),
+    inset 0 -7px 0 rgba(48, 24, 11, 0.28),
+    0 5px 0 #24150e;
   cursor: pointer;
-  transition: transform 140ms ease, box-shadow 140ms ease;
 }
 
 .new-field-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.3);
+  background: #9b683b;
 }
 
 .new-field-button:focus-visible {
-  outline: 3px solid #bfdbfe;
+  outline: 3px solid #fff1a3;
   outline-offset: 3px;
 }
 
