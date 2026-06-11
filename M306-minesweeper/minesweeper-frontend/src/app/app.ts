@@ -43,7 +43,31 @@ export class App implements OnInit {
       return;
     }
 
-    this.gameService.flag(x, y).subscribe(board => this.board = board);
+    const cell = this.board.cells[y]?.[x];
+
+    if (!cell || cell.revealed) {
+      return;
+    }
+
+    cell.flagged = !cell.flagged;
+
+    this.gameService.flag(x, y).subscribe(board => {
+      const currentBoard = this.board;
+
+      if (currentBoard) {
+        board.cells.forEach((row, rowIndex) => {
+          row.forEach((backendCell, columnIndex) => {
+            const currentCell = currentBoard.cells[rowIndex]?.[columnIndex];
+
+            if (currentCell && !backendCell.revealed) {
+              backendCell.flagged = currentCell.flagged;
+            }
+          });
+        });
+      }
+
+      this.board = board;
+    });
   }
 
   text(cell: Cell): string {
