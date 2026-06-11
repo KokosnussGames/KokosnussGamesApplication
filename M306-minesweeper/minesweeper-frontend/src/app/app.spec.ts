@@ -54,5 +54,6 @@ describe('App', () => {
     await fixture.whenStable();
 
     expect(compiled.querySelectorAll('.cell').length).toBe(4);
+    expect(compiled.textContent).toContain('Status: Läuft');
   });
 });

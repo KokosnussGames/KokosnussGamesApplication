@@ -6,7 +6,7 @@
   <p *ngIf="!board">Drücke Neues Spiel, um zu starten.</p>
 
   <section *ngIf="board as b">
-    <p>Status: {{ b.state }}</p>
+    <p>Status: {{ stateText(b.state) }}</p>
     <p>Minen: {{ b.mineCount }}</p>
 
     <div class="board">

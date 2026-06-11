@@ -94,6 +94,17 @@ export class App {
     return cell.adjacentMines > 0 ? String(cell.adjacentMines) : '';
   }
 
+  stateText(state: Board['state']): string {
+    switch (state) {
+      case 'RUNNING':
+        return 'Läuft';
+      case 'WON':
+        return 'Gewonnen';
+      case 'LOST':
+        return 'Game over';
+    }
+  }
+
   private setBoard(board: Board): void {
     this.board = board;
     this.changeDetector.detectChanges();
