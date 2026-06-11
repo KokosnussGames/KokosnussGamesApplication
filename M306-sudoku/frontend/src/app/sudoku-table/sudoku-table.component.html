@@ -4,10 +4,8 @@
   <table
     class="sudoku-table"
     #sudokuTable
-    (click)="onEditableCellFocus($event)"
-    (focusin)="onEditableCellFocus($event)"
-    (focusout)="onEditableCellBlur($event)"
-    (keyup)="onTableKeyup($event)"
+    (keydown)="onTableKeydown($event)"
+    (input)="onTableInput($event)"
   >
     <tbody>
       <tr class="">

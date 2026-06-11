@@ -1,5 +1,5 @@
 import { HttpClient } from "@angular/common/http";
-import { Component, ElementRef, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, ViewChild } from "@angular/core";
 
 @Component({
   selector: "app-sudoku-table",
@@ -7,54 +7,54 @@ import { Component, ElementRef, ViewChild } from "@angular/core";
   templateUrl: "./sudoku-table.component.html",
   styleUrls: ["./sudoku-table.component.css"]
 })
-export class SudokuTableComponent {
+export class SudokuTableComponent implements AfterViewInit {
   @ViewChild("sudokuTable", { static: true }) sudokuTableRef!: ElementRef<HTMLTableElement>;
-  private readonly emptyCellCaretMarker = "\u200B";
 
   constructor(private readonly http: HttpClient) {}
+
+  ngAfterViewInit(): void {
+    this.normalizeCells();
+  }
 
   generateNewField(): void {
     this.renderPuzzle(this.createPuzzle());
   }
 
-  onEditableCellFocus(event: Event): void {
-    const cell = this.getEditableCell(event.target);
-    if (cell === null) {
-      return;
-    }
-
-    this.prepareEmptyCellForCaret(cell);
-  }
-
-  onEditableCellBlur(event: Event): void {
-    const cell = this.getEditableCell(event.target);
-    if (cell === null || this.getCellValue(cell) !== "") {
-      return;
-    }
-
-    cell.textContent = "";
-  }
-
-  onTableKeyup(event: KeyboardEvent): void {
-    const target = this.getEditableCell(event.target);
+  onTableKeydown(event: KeyboardEvent): void {
+    const target = this.getEditableInput(event.target);
     if (target === null) {
       return;
     }
 
-    const currentValue = this.getCellValue(target);
-    if (target.textContent?.includes(this.emptyCellCaretMarker) && currentValue !== "") {
-      target.textContent = currentValue;
-      this.moveCaretToEnd(target);
-    }
-
-    if (!/^[1-9]$/.test(currentValue)) {
-      target.textContent = "";
-      target.classList.remove("incorrect-input");
-      this.prepareEmptyCellForCaret(target);
+    const allowedKeys = ["Backspace", "Delete", "Tab", "Enter", "Escape", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"];
+    if (allowedKeys.includes(event.key) || event.ctrlKey || event.metaKey) {
       return;
     }
 
-    const indexAttribute = target.getAttribute("cell-index");
+    if (!/^[1-9]$/.test(event.key)) {
+      event.preventDefault();
+    }
+  }
+
+  onTableInput(event: Event): void {
+    const target = this.getEditableInput(event.target);
+    if (target === null) {
+      return;
+    }
+
+    const currentValue = this.normalizeInputValue(target);
+    const cell = target.closest("td[cell-index]");
+
+    if (!(cell instanceof HTMLTableCellElement)) {
+      return;
+    }
+
+    if (currentValue === "") {
+      cell.classList.remove("incorrect-input");
+      return;
+    }
+
+    const indexAttribute = cell.getAttribute("cell-index");
     if (indexAttribute === null) {
       return;
     }
@@ -69,10 +69,10 @@ export class SudokuTableComponent {
 
     this.http.post<boolean>("/api/sudoku/move", payload).subscribe({
       next: (isAccepted: boolean) => {
-        target.classList.toggle("incorrect-input", !isAccepted);
+        cell.classList.toggle("incorrect-input", !isAccepted);
       },
       error: () => {
-        target.classList.add("incorrect-input");
+        cell.classList.add("incorrect-input");
       }
     });
   }
@@ -136,13 +136,15 @@ export class SudokuTableComponent {
       const cellIndex = Number.parseInt(indexAttribute, 10);
       const value = puzzle[cellIndex] ?? 0;
 
-      cell.classList.remove("incorrect-input");
-      cell.textContent = value === 0 ? "" : String(value);
+      cell.classList.remove("editable-cell", "fixed-cell", "incorrect-input");
+      cell.removeAttribute("contenteditable");
+      cell.textContent = "";
 
       if (value === 0) {
-        cell.setAttribute("contenteditable", "true");
+        this.addEditableInput(cell, cellIndex);
       } else {
-        cell.removeAttribute("contenteditable");
+        cell.classList.add("fixed-cell");
+        cell.textContent = String(value);
       }
     });
   }
@@ -164,15 +166,56 @@ export class SudokuTableComponent {
     return shuffled;
   }
 
-  private getEditableCell(target: EventTarget | null): HTMLTableCellElement | null {
-    if (target instanceof HTMLTableCellElement && target.isContentEditable) {
+  private normalizeCells(): void {
+    const cells = this.sudokuTableRef.nativeElement.querySelectorAll<HTMLTableCellElement>("td[cell-index]");
+
+    cells.forEach((cell: HTMLTableCellElement) => {
+      const indexAttribute = cell.getAttribute("cell-index");
+      if (indexAttribute === null) {
+        return;
+      }
+
+      const cellIndex = Number.parseInt(indexAttribute, 10);
+      const value = this.getCellValue(cell);
+
+      cell.classList.remove("editable-cell", "fixed-cell");
+      cell.removeAttribute("contenteditable");
+      cell.textContent = "";
+
+      if (value === "") {
+        this.addEditableInput(cell, cellIndex);
+      } else {
+        cell.classList.add("fixed-cell");
+        cell.textContent = value;
+      }
+    });
+  }
+
+  private addEditableInput(cell: HTMLTableCellElement, cellIndex: number): void {
+    const input = document.createElement("input");
+    input.className = "sudoku-input";
+    input.type = "number";
+    input.min = "1";
+    input.max = "9";
+    input.step = "1";
+    input.inputMode = "numeric";
+    input.pattern = "[1-9]";
+    input.autocomplete = "off";
+    input.setAttribute("aria-label", `Sudoku Feld ${cellIndex + 1}`);
+
+    cell.classList.add("editable-cell");
+    cell.appendChild(input);
+  }
+
+  private getEditableInput(target: EventTarget | null): HTMLInputElement | null {
+    if (target instanceof HTMLInputElement && target.classList.contains("sudoku-input")) {
       return target;
     }
 
     if (target instanceof Element) {
-      const cell = target.closest("td[contenteditable]");
-      if (cell instanceof HTMLTableCellElement) {
-        return cell;
+      const input = target.closest("input.sudoku-input");
+      if (input instanceof HTMLInputElement) {
+        return input;
       }
     }
 
@@ -180,34 +223,17 @@ export class SudokuTableComponent {
   }
 
   private getCellValue(cell: HTMLTableCellElement): string {
-    return (cell.textContent ?? "").split(this.emptyCellCaretMarker).join("").trim();
+    const input = cell.querySelector<HTMLInputElement>("input.sudoku-input");
+    if (input !== null) {
+      return input.value.trim();
+    }
+
+    return (cell.textContent ?? "").trim();
   }
 
-  private prepareEmptyCellForCaret(cell: HTMLTableCellElement): void {
-    if (this.getCellValue(cell) !== "") {
-      return;
-    }
-
-    cell.textContent = this.emptyCellCaretMarker;
-    this.moveCaretToEnd(cell);
-  }
-
-  private moveCaretToEnd(cell: HTMLTableCellElement): void {
-    const textNode = cell.firstChild;
-    if (!(textNode instanceof Text)) {
-      return;
-    }
-
-    const range = document.createRange();
-    range.setStart(textNode, textNode.length);
-    range.collapse(true);
-
-    const selection = window.getSelection();
-    if (selection === null) {
-      return;
-    }
-
-    selection.removeAllRanges();
-    selection.addRange(range);
+  private normalizeInputValue(input: HTMLInputElement): string {
+    const digit = input.value.match(/[1-9]/)?.[0] ?? "";
+    input.value = digit;
+    return digit;
   }
 }
