@@ -49,7 +49,10 @@ describe('App', () => {
     await fixture.whenStable();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.new-game')?.textContent).toContain('Neues Spiel');
+    compiled.querySelector<HTMLButtonElement>('.new-game')?.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
     expect(compiled.querySelectorAll('.cell').length).toBe(4);
   });
 });

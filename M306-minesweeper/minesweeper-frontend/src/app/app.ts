@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { GameService } from './services/game.service';
 import { Board, Cell } from './models/board';
@@ -10,21 +10,23 @@ import { Board, Cell } from './models/board';
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
-export class App implements OnInit {
+export class App {
   board?: Board;
   error = '';
 
-  constructor(private gameService: GameService) {}
-
-  ngOnInit(): void {
-    this.newGame();
-  }
+  constructor(
+    private gameService: GameService,
+    private changeDetector: ChangeDetectorRef
+  ) {}
 
   newGame(): void {
     this.error = '';
     this.gameService.newGame().subscribe({
-      next: board => this.board = board,
-      error: () => this.error = 'Backend nicht erreichbar. Starte das Java-Backend auf Port 8080.'
+      next: board => this.setBoard(board),
+      error: () => {
+        this.error = 'Backend nicht erreichbar. Starte das Java-Backend auf Port 8080.';
+        this.changeDetector.detectChanges();
+      }
     });
   }
 
@@ -33,7 +35,16 @@ export class App implements OnInit {
       return;
     }
 
-    this.gameService.reveal(x, y).subscribe(board => this.board = board);
+    this.gameService.reveal(x, y).subscribe(board => this.setBoard(board));
+  }
+
+  revealFromPointer(event: PointerEvent, x: number, y: number): void {
+    if (event.button !== 0) {
+      return;
+    }
+
+    event.preventDefault();
+    this.reveal(x, y);
   }
 
   flag(event: MouseEvent, x: number, y: number): void {
@@ -50,6 +61,7 @@ export class App implements OnInit {
     }
 
     cell.flagged = !cell.flagged;
+    this.changeDetector.detectChanges();
 
     this.gameService.flag(x, y).subscribe(board => {
       const currentBoard = this.board;
@@ -66,7 +78,7 @@ export class App implements OnInit {
         });
       }
 
-      this.board = board;
+      this.setBoard(board);
     });
   }
 
@@ -80,5 +92,10 @@ export class App implements OnInit {
     }
 
     return cell.adjacentMines > 0 ? String(cell.adjacentMines) : '';
+  }
+
+  private setBoard(board: Board): void {
+    this.board = board;
+    this.changeDetector.detectChanges();
   }
 }
