@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { NgClass, NgForOf, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NonogramApiService } from '../services/nonogram-api.service';
@@ -13,7 +13,10 @@ type LineStatus = 'neutral' | 'completed' | 'invalid';
   templateUrl: './nonogram.component.html',
   styleUrl: './nonogram.component.scss'
 })
-export class NonogramComponent implements OnInit {
+export class NonogramComponent implements OnInit, AfterViewInit {
+  @ViewChild('scrollContainer') scrollContainer?: ElementRef<HTMLDivElement>;
+  @ViewChild('scrollbarTrack') scrollbarTrack?: ElementRef<HTMLDivElement>;
+
   puzzle?: NonogramPuzzle;
   puzzles: NonogramPuzzle[] = [];
   searchText = '';
@@ -24,12 +27,22 @@ export class NonogramComponent implements OnInit {
   solutionProblem = false;
   isDragging = false;
   dragMode: 0 | 1 | 2 = 1;
+  scrollThumbHeight = 96;
+  scrollThumbTop = 0;
+  scrollThumbReady = false;
+  private isDraggingScrollbar = false;
+  private scrollbarDragStartY = 0;
+  private scrollbarDragStartTop = 0;
 
   constructor(private nonogramApiService: NonogramApiService) {}
 
   ngOnInit(): void {
     this.loadPuzzles();
     this.loadPuzzle(1);
+  }
+
+  ngAfterViewInit(): void {
+    this.queueScrollThumbUpdate();
   }
 
   loadPuzzles(): void {
@@ -53,6 +66,7 @@ export class NonogramComponent implements OnInit {
         this.message = '';
         this.gameSolved = false;
         this.solutionProblem = false;
+        this.queueScrollThumbUpdate();
       },
       error: () => {
         this.message = 'Could not load puzzle.';
@@ -120,6 +134,85 @@ export class NonogramComponent implements OnInit {
 
     this.isDragging = false;
     this.checkSolvedAutomatically();
+  }
+
+  updateScrollThumb(): void {
+    const container = this.scrollContainer?.nativeElement;
+    const track = this.scrollbarTrack?.nativeElement;
+
+    if (!container || !track) {
+      return;
+    }
+
+    const trackHeight = Math.max(track.clientHeight - 12, 0);
+    const scrollableHeight = container.scrollHeight - container.clientHeight;
+    const visibleRatio = container.clientHeight / container.scrollHeight;
+
+    this.scrollThumbHeight = Math.min(Math.max(trackHeight * visibleRatio, 96), trackHeight);
+    this.scrollThumbTop = scrollableHeight > 0
+      ? (container.scrollTop / scrollableHeight) * (trackHeight - this.scrollThumbHeight)
+      : 0;
+    this.scrollThumbReady = true;
+  }
+
+  private queueScrollThumbUpdate(): void {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => this.updateScrollThumb());
+    });
+
+    setTimeout(() => this.updateScrollThumb(), 300);
+  }
+
+  startScrollbarDrag(event: MouseEvent): void {
+    const container = this.scrollContainer?.nativeElement;
+
+    if (!container) {
+      return;
+    }
+
+    event.preventDefault();
+    this.isDraggingScrollbar = true;
+    this.scrollbarDragStartY = event.clientY;
+    this.scrollbarDragStartTop = container.scrollTop;
+    document.body.style.userSelect = 'none';
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  dragScrollbar(event: MouseEvent): void {
+    const container = this.scrollContainer?.nativeElement;
+    const track = this.scrollbarTrack?.nativeElement;
+
+    if (!this.isDraggingScrollbar || !container || !track) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const trackHeight = Math.max(track.clientHeight - 12, 0);
+    const maxThumbTop = trackHeight - this.scrollThumbHeight;
+    const scrollableHeight = container.scrollHeight - container.clientHeight;
+    const dragDistance = event.clientY - this.scrollbarDragStartY;
+    const scrollDistance = maxThumbTop > 0
+      ? (dragDistance / maxThumbTop) * scrollableHeight
+      : 0;
+
+    container.scrollTop = this.scrollbarDragStartTop + scrollDistance;
+    this.updateScrollThumb();
+  }
+
+  @HostListener('document:mouseup')
+  stopScrollbarDrag(): void {
+    if (!this.isDraggingScrollbar) {
+      return;
+    }
+
+    this.isDraggingScrollbar = false;
+    document.body.style.userSelect = '';
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.queueScrollThumbUpdate();
   }
 
   private setCell(row: number, col: number, value: 0 | 1 | 2): void {

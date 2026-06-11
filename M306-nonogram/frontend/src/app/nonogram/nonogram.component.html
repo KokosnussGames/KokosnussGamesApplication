@@ -1,9 +1,20 @@
 <div
+  #scrollContainer
   class="nonogram-page"
   *ngIf="puzzle"
+  (scroll)="updateScrollThumb()"
   (mouseup)="stopDrag()"
   (mouseleave)="stopDrag()"
 >
+  <div #scrollbarTrack class="wood-scrollbar" (mousedown)="startScrollbarDrag($event)">
+    <div
+      class="wood-scrollbar-thumb"
+      [class.is-ready]="scrollThumbReady"
+      [style.height.px]="scrollThumbHeight"
+      [style.transform]="'translateY(' + scrollThumbTop + 'px)'"
+    ></div>
+  </div>
+
   <h1>Nonogram</h1>
   <h2>{{ puzzle.name }}</h2>
 
